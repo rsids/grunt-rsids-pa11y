@@ -13,9 +13,12 @@ module.exports = function (grunt) {
   var async = require('async'),
     chalk = require('chalk'),
     fs = require('fs'),
-    pa11y = require('pa11y');
+    pa11y = require('pa11y'),
+    path = require('path');
 
   grunt.registerMultiTask('rsids_pa11y', 'Grunt wrapper for pa11y', function () {
+
+    grunt.log.ok(['Starting grunt-rsids-pa11y']);
 
     var done = this.async();
 
@@ -28,6 +31,9 @@ module.exports = function (grunt) {
       timeout: 30000,
       debug: false
     });
+    if(!this.data.url) {
+      grunt.fatal('No url(s) specified');
+    }
 
     var reporterScript,
       reporter;
@@ -59,20 +65,28 @@ module.exports = function (grunt) {
       reporter = require(reporterScript);
       options.log = reporter;
     } catch (err) {
-      grunt.log.error(['Error: Reporter "' + reporterScript + '" not found']);
+      grunt.fatal('Error: Reporter "' + reporterScript + '" not found');
     }
 
-
+    if(options.debug === false) {
+      options.log.debug = function() {}
+    }
 
     var test = pa11y(options),
       urlsToTest = this.data.url;
 
+
     if (typeof urlsToTest === 'string') {
       urlsToTest = [urlsToTest];
     }
+    urlsToTest = grunt.file.expand(urlsToTest);
+
     async.eachSeries(urlsToTest,
       function (url, callback) {
         console.log(chalk.cyan('Getting ready to test', url, 'against the', options.standard, 'standard.'));
+        if(url.indexOf('http') === -1) {
+          url = 'file://' + path.resolve(url);
+        }
         options.url = url;
 
         test.run(url, function (error, results) {
