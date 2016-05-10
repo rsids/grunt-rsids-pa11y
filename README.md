@@ -28,15 +28,25 @@ grunt.initConfig({
     options: {
       // Task-specific options go here.
     },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+    url: ['array of urls'],
+    file: ['array of files, globbing permitted']
   },
 });
 ```
+
+You can pass a commandline argument `--url=###` to override your configuration
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
+
+### 0.3.0 (2016-05-10)
+
+- Added command line feature
+
+### 0.2.0 (2016-04-20)
+
+- Added support for globbing files
+- Added errors for missing url property
+- Implemented debug flag

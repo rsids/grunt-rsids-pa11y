@@ -8,22 +8,23 @@
 
 'use strict';
 
-module.exports = function (grunt) {
+module.exports = (grunt) => {
 
-  var async = require('async'),
+  const async = require('async'),
     chalk = require('chalk'),
     fs = require('fs'),
     pa11y = require('pa11y'),
-    path = require('path');
+    path = require('path'),
+    validUrl = require('valid-url');
 
   grunt.registerMultiTask('rsids_pa11y', 'Grunt wrapper for pa11y', function () {
 
     grunt.log.ok(['Starting grunt-rsids-pa11y']);
 
-    var done = this.async();
+    let done = this.async();
 
     // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
+    let options = this.options({
       reporter: 'console',
       standard: 'WCAG2AA',
       htmlcs: 'http://squizlabs.github.io/HTML_CodeSniffer/build/HTMLCS.js',
@@ -31,11 +32,12 @@ module.exports = function (grunt) {
       timeout: 30000,
       debug: false
     });
+
     if(!this.data.url) {
       grunt.fatal('No url(s) specified');
     }
 
-    var reporterScript,
+    let reporterScript,
       reporter;
 
     switch (options.reporter) {
@@ -72,21 +74,38 @@ module.exports = function (grunt) {
       options.log.debug = function() {}
     }
 
-    var test = pa11y(options),
-      urlsToTest = this.data.url;
+    let test = pa11y(options),
+      urls = this.data.url,
+      files = this.data.file;
 
-
-    if (typeof urlsToTest === 'string') {
-      urlsToTest = [urlsToTest];
+    if(grunt.option('url')) {
+      urls = grunt.option('url');
+      files = [];
     }
-    urlsToTest = grunt.file.expand(urlsToTest);
 
-    async.eachSeries(urlsToTest,
+    if(grunt.option('file')) {
+      urls = [];
+      files = grunt.option('file');
+    }
+
+    if (typeof urls === 'string') {
+      urls = [urls];
+    }
+
+    if (typeof files === 'string') {
+      files = [files];
+    }
+
+    files = grunt.file.expand(files);
+    files = files.map(file => {
+      return `file://${path.resolve(file)}`;
+    });
+
+    urls = [].concat(urls, files);
+    async.eachSeries(urls,
       function (url, callback) {
         console.log(chalk.cyan('Getting ready to test', url, 'against the', options.standard, 'standard.'));
-        if(url.indexOf('http') === -1) {
-          url = 'file://' + path.resolve(url);
-        }
+
         options.url = url;
 
         test.run(url, function (error, results) {

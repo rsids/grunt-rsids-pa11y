@@ -35,7 +35,8 @@ module.exports = function(grunt) {
           reporter: 'html',
           dest: 'report.html'
         },
-        url: ['google.com', 'nu.nl']
+        url: ['http://google.com', 'nu.nl'],
+        file: ['*.html']
       }
 
     },

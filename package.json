@@ -1,7 +1,7 @@
 {
   "name": "grunt-rsids-pa11y",
   "description": "Grunt wrapper for pa11y",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/rsids/grunt-rsids-pa11y",
   "author": {
     "name": "Ids Klijnsma",
@@ -38,6 +38,7 @@
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "chalk": "^1.1.3",
-    "pa11y": "^3.6.0"
+    "pa11y": "^3.6.0",
+    "valid-url": "^1.0.9"
   }
 }
