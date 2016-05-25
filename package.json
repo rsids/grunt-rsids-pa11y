@@ -33,7 +33,7 @@
     "grunt": "~0.4.5"
   },
   "keywords": [
-    "gruntplugin"
+    "gruntplugin", "grunt", "pa11y", "rsids","a11y", "accessibility"
   ],
   "dependencies": {
     "async": "^2.0.0-rc.3",
