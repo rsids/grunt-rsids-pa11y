@@ -14,8 +14,7 @@ module.exports = (grunt) => {
     chalk = require('chalk'),
     fs = require('fs'),
     pa11y = require('pa11y'),
-    path = require('path'),
-    validUrl = require('valid-url');
+    path = require('path');
 
   grunt.registerMultiTask('rsids_pa11y', 'Grunt wrapper for pa11y', function () {
 
@@ -33,7 +32,7 @@ module.exports = (grunt) => {
       debug: false
     });
 
-    if(!this.data.url) {
+    if(!this.data.url && !this.data.file && !grunt.option('url') && !grunt.option('file')) {
       grunt.fatal('No url(s) specified');
     }
 
@@ -75,8 +74,8 @@ module.exports = (grunt) => {
     }
 
     let test = pa11y(options),
-      urls = this.data.url,
-      files = this.data.file;
+      urls = this.data.url || [],
+      files = this.data.file || [];
 
     if(grunt.option('url')) {
       urls = grunt.option('url');
@@ -95,7 +94,7 @@ module.exports = (grunt) => {
     if (typeof files === 'string') {
       files = [files];
     }
-
+    console.log(files, urls);
     files = grunt.file.expand(files);
     files = files.map(file => {
       return `file://${path.resolve(file)}`;
@@ -117,8 +116,8 @@ module.exports = (grunt) => {
             // Catch the console log results with the hook
             var report = '',
               unhook = hook_stdout(function(str) {
-              report += str;
-            });
+                report += str;
+              });
 
             // Process the results
             options.log.results(results, url);
