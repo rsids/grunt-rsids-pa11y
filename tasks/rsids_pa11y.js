@@ -32,7 +32,7 @@ module.exports = (grunt) => {
       debug: false
     });
 
-    if(!this.data.url && !this.data.file && !grunt.option('url') && !grunt.option('file')) {
+    if (!this.data.url && !this.data.file && !grunt.option('url') && !grunt.option('file')) {
       grunt.fatal('No url(s) specified');
     }
 
@@ -69,20 +69,21 @@ module.exports = (grunt) => {
       grunt.fatal('Error: Reporter "' + reporterScript + '" not found');
     }
 
-    if(options.debug === false) {
-      options.log.debug = function() {}
+    if (options.debug === false) {
+      options.log.debug = function () {
+      }
     }
 
     let test = pa11y(options),
       urls = this.data.url || [],
       files = this.data.file || [];
 
-    if(grunt.option('url')) {
+    if (grunt.option('url')) {
       urls = grunt.option('url');
       files = [];
     }
 
-    if(grunt.option('file')) {
+    if (grunt.option('file')) {
       urls = [];
       files = grunt.option('file');
     }
@@ -94,28 +95,27 @@ module.exports = (grunt) => {
     if (typeof files === 'string') {
       files = [files];
     }
-    console.log(files, urls);
     files = grunt.file.expand(files);
     files = files.map(file => {
-      return `file://${path.resolve(file)}`;
+      return `file:///${path.resolve(file)}`;
     });
 
     urls = [].concat(urls, files);
     async.eachSeries(urls,
-      function (url, callback) {
+      (url, callback) => {
         console.log(chalk.cyan('Getting ready to test', url, 'against the', options.standard, 'standard.'));
 
         options.url = url;
 
-        test.run(url, function (error, results) {
+        test.run(url, (error, results) => {
           if (error) {
             grunt.log.error(['Failed to run accessibility test']);
             callback(error);
           } else {
 
             // Catch the console log results with the hook
-            var report = '',
-              unhook = hook_stdout(function(str) {
+            let report = '',
+              unhook = hook_stdout(str => {
                 report += str;
               });
 
@@ -125,12 +125,12 @@ module.exports = (grunt) => {
             unhook();
 
             if (options.dest) {
-              var dest = options.dest.split('/'),
+              let dest = options.dest.split('/'),
                 filename = dest.pop();
               // Replace all non-alpha-numeric characters with a dash, and replace multiple dashes with a single dash
               filename = url.replace(/[^a-z0-9\.\-_]/gi, '-').replace(/\-{2,}/gi, '-') + '-' + filename;
               filename = dest.join('/') + filename;
-              fs.writeFile(filename, report, function (err) {
+              fs.writeFile(filename, report, err => {
                 if (err) {
                   grunt.log.error(['Failed to write report to ' + options.dest]);
                   callback(err);
@@ -170,16 +170,16 @@ module.exports = (grunt) => {
  * @returns {Function} A reset function, when called normal stdout is restored
  */
 function hook_stdout(callback) {
-  var old_write = process.stdout.write;
+  let old_write = process.stdout.write;
 
-  process.stdout.write = (function(write) {
-    return function(string, encoding, fd) {
+  process.stdout.write = (write => {
+    return (string, encoding, fd) => {
       //write.apply(process.stdout, arguments);
       callback(string, encoding, fd)
     }
   })(process.stdout.write);
 
-  return function() {
+  return () => {
     process.stdout.write = old_write
   }
 }
