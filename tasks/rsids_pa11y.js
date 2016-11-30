@@ -14,6 +14,7 @@ module.exports = (grunt) => {
     chalk = require('chalk'),
     fs = require('fs'),
     pa11y = require('pa11y'),
+    phantomjs = require('phantomjs-prebuilt'),
     path = require('path');
 
   grunt.registerMultiTask('rsids_pa11y', 'Grunt wrapper for pa11y', function () {
@@ -66,13 +67,17 @@ module.exports = (grunt) => {
       reporter = require(reporterScript);
       options.log = reporter;
     } catch (err) {
-      grunt.fatal('Error: Reporter "' + reporterScript + '" not found');
+      grunt.fatal(`Error: Reporter '${reporterScript}" not found`);
     }
 
     if (options.debug === false) {
       options.log.debug = function () {
       }
     }
+
+    options.phantom = {
+      path: phantomjs.path
+    };
 
     let test = pa11y(options),
       urls = this.data.url || [],
@@ -180,6 +185,6 @@ function hook_stdout(callback) {
   })(process.stdout.write);
 
   return () => {
-    process.stdout.write = old_write
+    process.stdout.write = old_write;
   }
 }
