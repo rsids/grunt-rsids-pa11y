@@ -115,6 +115,7 @@ module.exports = (grunt) => {
         test.run(url, (error, results) => {
           if (error) {
             grunt.log.error(['Failed to run accessibility test']);
+            grunt.log.error(error);
             callback(error);
           } else {
 
